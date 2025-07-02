@@ -1,11 +1,23 @@
 {
-  "name": "fast-mcp-graphql",
-  "version": "1.0.0",
-  "description": "MCP server that proxies to GraphQL services with dynamic tool generation",
-  "main": "dist/index.js",
+  "name": "mcp-graphql-forge",
+  "version": "0.0.1",
+  "description": "High-performance MCP server that automatically generates tools from GraphQL schemas with intelligent caching and validation",
+  "main": "dist/cli.js",
   "type": "module",
   "bin": {
-    "fast-mcp-graphql": "bin/fast-mcp-graphql.js"
+    "mcp-graphql-forge": "./bin/mcp-graphql-forge.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toolprint/mcp-graphql-forge.git"
+  },
+  "homepage": "https://github.com/toolprint/mcp-graphql-forge#readme",
+  "bugs": {
+    "url": "https://github.com/toolprint/mcp-graphql-forge/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "build": "tsc",
@@ -22,9 +34,20 @@
     "prepublishOnly": "npm run build",
     "introspect:test": "GRAPHQL_ENDPOINT=https://patient-song-383e3762d2.strapiapp.com/graphql tsx src/introspect.ts"
   },
-  "keywords": ["mcp", "graphql", "proxy", "tools"],
-  "author": "",
-  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "graphql",
+    "proxy",
+    "tools",
+    "ai",
+    "automation",
+    "schema-introspection",
+    "caching",
+    "typescript"
+  ],
+  "author": "Toolprint, Inc. <hello@toolprint.com>",
+  "license": "Apache-2.0",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "commander": "^11.1.0",
