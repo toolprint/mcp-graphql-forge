@@ -1,6 +1,6 @@
 {
   "name": "@toolprint/mcp-graphql-forge",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "MCP server that exposes GraphQL APIs to AI tools through automatic schema introspection and tool generation",
   "main": "dist/cli.js",
   "type": "module",
