@@ -1,6 +1,6 @@
 # MCP GraphQL Forge
 
-[![NPM Version](https://img.shields.io/npm/v/mcp-graphql-forge)](https://www.npmjs.com/package/mcp-graphql-forge)
+[![NPM Version](https://img.shields.io/npm/v/@toolprint/mcp-graphql-forge)](https://www.npmjs.com/package/@toolprint/mcp-graphql-forge)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 [![MCP](https://img.shields.io/badge/MCP-2024--11--05-green)](https://modelcontextprotocol.io/)
@@ -63,9 +63,7 @@ Create an `mcp.json` in your project root:
         }
     }
 }
-
-
-Place this `mcp.json` in your project root to enable AI tools to directly interact with your GraphQL APIs.
+```
 
 ### Schema Management
 
@@ -352,7 +350,7 @@ mcp-graphql-forge
 # Connect to GitHub GraphQL API
 export GRAPHQL_ENDPOINT="https://api.github.com/graphql"
 export GRAPHQL_AUTH_HEADER="Bearer YOUR_GITHUB_TOKEN"
-fast-mcp-graphql
+mcp-graphql-forge
 
 # Generates tools like:
 # - query_repository, query_user, query_organization
@@ -368,7 +366,7 @@ fast-mcp-graphql
 # Connect to Shopify/WooCommerce GraphQL
 export GRAPHQL_ENDPOINT="https://your-shop.myshopify.com/api/graphql"
 export GRAPHQL_HEADER_X_SHOPIFY_ACCESS_TOKEN="YOUR_TOKEN"
-fast-mcp-graphql
+mcp-graphql-forge
 
 # Generates tools for:
 # - Product management (query_products, mutation_productCreate)
@@ -406,16 +404,13 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 🏢 About OneGrep, Inc.
 
-Fast MCP GraphQL is developed and maintained by [OneGrep, Inc.](https://onegrep.com), a company focused on building developer tools and AI infrastructure.
+MCP GraphQL Forge is developed and maintained by [OneGrep, Inc.](https://onegrep.dev), a company focused on building developer tools and AI infrastructure.
 
 ---
 
 <div align="center">
-
-**[Documentation](https://onegrep.github.io/fast-mcp-graphql)** • 
-**[Examples](https://github.com/onegrep/fast-mcp-graphql/tree/main/examples)** • 
-**[Issues](https://github.com/onegrep/fast-mcp-graphql/issues)** • 
-**[Discussions](https://github.com/onegrep/fast-mcp-graphql/discussions)**
+**[Issues](https://github.com/toolprint/mcp-graphql-forge/issues)** • 
+**[Discussions](https://github.com/toolprint/mcp-graphql-forge/discussions)**
 
 Made with ❤️ by the OneGrep team
 
