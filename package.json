@@ -31,8 +31,7 @@
     "test:coverage": "vitest --coverage",
     "lint": "eslint src/**/*.ts",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build",
-    "introspect:test": "GRAPHQL_ENDPOINT=https://patient-song-383e3762d2.strapiapp.com/graphql tsx src/introspect.ts"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",

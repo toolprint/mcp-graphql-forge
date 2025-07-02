@@ -25,8 +25,8 @@ An MCP server that makes GraphQL APIs accessible to AI tools by:
 
 1. **Start the server**:
    ```bash
-   # Start server with HTTP transport
-   GRAPHQL_ENDPOINT="https://your-api.com/graphql" npx @toolprint/mcp-graphql-forge --transport http --port 3001
+   # Start serving it with the Streamable HTTP transport
+   GRAPHQL_ENDPOINT="https://your-api.com/graphql" npx -y @toolprint/mcp-graphql-forge --transport http --port 3001
    ```
 
 2. **Connect with MCP Inspector**:
@@ -48,14 +48,17 @@ An MCP server that makes GraphQL APIs accessible to AI tools by:
 
 ### Direct AI Integration (Claude/Cursor)
 
-Create an `mcp.json` in your project root:
+Create an `mcp.json` in your project root. This will run it in **stdio** mode.
 
 ```json
 {
     "mcpServers": {
         "mcp-graphql-forge": {
             "command": "npx",
-            "args": ["@toolprint/mcp-graphql-forge"],
+            "args": [
+              "-y",
+              "@toolprint/mcp-graphql-forge"
+            ],
             "env": {
                 "GRAPHQL_ENDPOINT": "https://your-api.com/graphql",
                 "GRAPHQL_AUTH_HEADER": "Bearer YOUR_TOKEN"
@@ -408,10 +411,7 @@ MCP GraphQL Forge is developed and maintained by [OneGrep, Inc.](https://onegrep
 
 ---
 
-<div align="center">
 **[Issues](https://github.com/toolprint/mcp-graphql-forge/issues)** • 
 **[Discussions](https://github.com/toolprint/mcp-graphql-forge/discussions)**
 
 Made with ❤️ by the OneGrep team
-
-</div>
