@@ -115,6 +115,12 @@ class GraphQLMCPServer {
           throw new Error(`Unknown tool: ${name}`);
         }
 
+        // Validate required parameters
+        const missingParams = this.validateRequiredParameters(tool, args);
+        if (missingParams.length > 0) {
+          throw new Error(`Missing required parameters: ${missingParams.join(', ')}`);
+        }
+
         const query = this.buildGraphQLOperation(tool._graphql, args);
         
         // Debug: Print the complete GraphQL request in a readable format
@@ -172,6 +178,20 @@ class GraphQLMCPServer {
     });
   }
 
+  private validateRequiredParameters(tool: MCPTool, args: any): string[] {
+    const missingParams: string[] = [];
+    const requiredParams = tool.inputSchema.required || [];
+    
+    for (const param of requiredParams) {
+      if (args === undefined || args === null || 
+          !Object.prototype.hasOwnProperty.call(args, param) || 
+          args[param] === undefined || args[param] === null) {
+        missingParams.push(param);
+      }
+    }
+    
+    return missingParams;
+  }
 
   private buildGraphQLOperation(graphqlInfo: NonNullable<MCPTool['_graphql']>, variables: any): string {
     const { fieldName, operationType, args, fieldSelection } = graphqlInfo;

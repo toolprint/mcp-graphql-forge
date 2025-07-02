@@ -162,6 +162,165 @@ describe('Field Selection Caching System', () => {
     });
   });
 
+  describe('Required Parameters', () => {
+    it('should mark GraphQL required parameters as required in JSON schema', () => {
+      // Check that all tools properly handle required parameters
+      tools.forEach(tool => {
+        if (tool._graphql?.args && tool._graphql.args.length > 0) {
+          // Find GraphQL required args (NonNull type AND no default value)
+          const requiredGraphQLArgs = tool._graphql.args.filter(arg => 
+            arg.type.toString().includes('!') && arg.defaultValue === undefined
+          );
+          const requiredArgNames = requiredGraphQLArgs.map(arg => arg.name);
+          
+          // Compare with JSON schema required array
+          const jsonRequired = tool.inputSchema.required || [];
+          
+          // Every required GraphQL arg should be in JSON schema required array
+          requiredArgNames.forEach(argName => {
+            expect(jsonRequired).toContain(argName);
+          });
+          
+          // JSON schema required array should not contain non-required GraphQL args
+          const optionalGraphQLArgs = tool._graphql.args.filter(arg => 
+            !arg.type.toString().includes('!') || arg.defaultValue !== undefined
+          );
+          const optionalArgNames = optionalGraphQLArgs.map(arg => arg.name);
+          
+          optionalArgNames.forEach(argName => {
+            expect(jsonRequired).not.toContain(argName);
+          });
+        }
+      });
+    });
+
+    it('should properly detect NonNull types as required', () => {
+      // Find a tool that should have required parameters
+      const userTool = tools.find(t => t.name === 'query_user');
+      expect(userTool).toBeDefined();
+      
+      if (userTool?._graphql?.args) {
+        const idArg = userTool._graphql.args.find(arg => arg.name === 'id');
+        expect(idArg).toBeDefined();
+        
+        // ID should be required (ID! in GraphQL)
+        expect(idArg?.type.toString()).toContain('!');
+        expect(userTool.inputSchema.required).toContain('id');
+      }
+    });
+
+    it('should not mark optional parameters as required', () => {
+      // Find a tool with optional parameters
+      const usersTool = tools.find(t => t.name === 'query_users');
+      expect(usersTool).toBeDefined();
+      
+      if (usersTool?._graphql?.args) {
+        const optionalArgs = usersTool._graphql.args.filter(arg => 
+          !arg.type.toString().includes('!') || arg.defaultValue !== undefined
+        );
+        
+        if (optionalArgs.length > 0) {
+          const requiredArray = usersTool.inputSchema.required || [];
+          
+          optionalArgs.forEach(arg => {
+            expect(requiredArray).not.toContain(arg.name);
+          });
+        }
+      }
+    });
+
+    it('should handle mixed required and optional parameters correctly', () => {
+      // Test tools that have both required and optional parameters
+      const toolsWithMixedParams = tools.filter(tool => {
+        if (!tool._graphql?.args || tool._graphql.args.length === 0) return false;
+        
+        const hasRequired = tool._graphql.args.some(arg => 
+          arg.type.toString().includes('!') && arg.defaultValue === undefined
+        );
+        const hasOptional = tool._graphql.args.some(arg => 
+          !arg.type.toString().includes('!') || arg.defaultValue !== undefined
+        );
+        
+        return hasRequired && hasOptional;
+      });
+
+      expect(toolsWithMixedParams.length).toBeGreaterThan(0);
+      
+      toolsWithMixedParams.forEach(tool => {
+        const requiredArgs = tool._graphql!.args.filter(arg => 
+          arg.type.toString().includes('!') && arg.defaultValue === undefined
+        );
+        const optionalArgs = tool._graphql!.args.filter(arg => 
+          !arg.type.toString().includes('!') || arg.defaultValue !== undefined
+        );
+        const jsonRequired = tool.inputSchema.required || [];
+        
+        // All required GraphQL args should be in JSON required
+        requiredArgs.forEach(arg => {
+          expect(jsonRequired).toContain(arg.name);
+        });
+        
+        // No optional GraphQL args should be in JSON required
+        optionalArgs.forEach(arg => {
+          expect(jsonRequired).not.toContain(arg.name);
+        });
+        
+        // JSON required should have exactly the same length as GraphQL required args
+        expect(jsonRequired.length).toBe(requiredArgs.length);
+      });
+    });
+
+    it('should properly handle parameters with default values', () => {
+      // Look for the createPost mutation which has tags with default value
+      const createPostTool = tools.find(t => t.name === 'mutation_createPost');
+      expect(createPostTool).toBeDefined();
+      
+      if (createPostTool?._graphql?.args) {
+        const tagsArg = createPostTool._graphql.args.find(arg => arg.name === 'tags');
+        if (tagsArg) {
+          // tags should have a default value and therefore not be required
+          expect(tagsArg.defaultValue).toBeDefined();
+          expect(createPostTool.inputSchema.required).not.toContain('tags');
+        }
+        
+        // But required args without defaults should still be required
+        const titleArg = createPostTool._graphql.args.find(arg => arg.name === 'title');
+        if (titleArg) {
+          expect(titleArg.type.toString()).toContain('!');
+          expect(titleArg.defaultValue).toBeUndefined();
+          expect(createPostTool.inputSchema.required).toContain('title');
+        }
+      }
+    });
+
+    it('should prevent execution when required parameters are missing', () => {
+      // This test verifies that our JSON schema correctly identifies required parameters
+      // so that MCP clients can enforce them before GraphQL execution
+      const userTool = tools.find(t => t.name === 'query_user');
+      expect(userTool).toBeDefined();
+      
+      // Verify the JSON schema is correctly set up for validation
+      expect(userTool?.inputSchema.required).toContain('id');
+      expect(userTool?.inputSchema.properties.id).toBeDefined();
+      expect(userTool?.inputSchema.type).toBe('object');
+      
+      // The JSON schema should validate that required fields are present
+      // This prevents the GraphQL "Variable not provided" error by catching it earlier
+      const schema = userTool?.inputSchema;
+      if (schema) {
+        // Empty object should fail validation for required fields
+        const emptyParams = {};
+        const hasAllRequired = schema.required?.every(field => field in emptyParams) ?? true;
+        expect(hasAllRequired).toBe(false); // Should fail validation
+        
+        // Object with required fields should pass
+        const validParams = { id: 'test-id' };
+        const hasAllRequiredValid = schema.required?.every(field => field in validParams) ?? true;
+        expect(hasAllRequiredValid).toBe(true); // Should pass validation
+      }
+    });
+  });
+
   describe('Real-world Scenarios', () => {
     it('should handle deeply nested object hierarchies', () => {
       // Test with a complex query that has deep nesting

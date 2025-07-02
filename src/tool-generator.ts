@@ -275,7 +275,8 @@ function generateToolForField(
       if (arg.description) {
         properties[arg.name].description = arg.description;
       }
-      if (isNonNullType(arg.type)) {
+      // Only mark as required if it's NonNull AND doesn't have a default value
+      if (isNonNullType(arg.type) && arg.defaultValue === undefined) {
         required.push(arg.name);
       }
     }
