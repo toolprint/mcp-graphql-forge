@@ -5,3 +5,5 @@ dist/
 .DS_Store
 schema.json
 tools.json
+**/.claude
+
