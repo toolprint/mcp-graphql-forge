@@ -5,11 +5,11 @@
   "main": "dist/cli.js",
   "type": "module",
   "bin": {
-    "mcp-graphql-forge": "./bin/mcp-graphql-forge.js"
+    "mcp-graphql-forge": "bin/mcp-graphql-forge.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/toolprint/mcp-graphql-forge.git"
+    "url": "git+https://github.com/toolprint/mcp-graphql-forge.git"
   },
   "homepage": "https://github.com/toolprint/mcp-graphql-forge#readme",
   "bugs": {
