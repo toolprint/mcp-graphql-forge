@@ -5,7 +5,7 @@
   "main": "dist/cli.js",
   "type": "module",
   "bin": {
-    "mcp-graphql-forge": "bin/mcp-graphql-forge.js"
+    "mcp-graphql-forge": "dist/bin.js"
   },
   "repository": {
     "type": "git",
