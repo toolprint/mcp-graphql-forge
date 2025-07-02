@@ -5,21 +5,19 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 [![MCP](https://img.shields.io/badge/MCP-2024--11--05-green)](https://modelcontextprotocol.io/)
 
-🚀 **High-performance MCP server that automatically generates tools from GraphQL schemas with intelligent caching and validation**
-
-An MCP (Model Context Protocol) server that transforms any GraphQL API into a collection of AI-accessible tools through automatic schema introspection, intelligent field selection generation, and comprehensive parameter validation.
+An MCP server that makes GraphQL APIs accessible to AI tools by:
+- Automatically generating MCP tools from GraphQL schema introspection
+- Validating parameters and handling errors for reliable AI interactions
+- Supporting both stdio and HTTP transports for development and production
+- Caching schema and field selections for consistent performance
 
 ## ✨ Features
 
-- 🔄 **Dynamic Tool Generation**: Automatically creates MCP tools from GraphQL schema introspection
-- ⚡ **Intelligent Field Selection Caching**: Pre-generates and caches optimal GraphQL field selections for consistent performance
-- 🛡️ **Robust Parameter Validation**: Multi-layer validation prevents GraphQL errors with clear, actionable error messages
-- 🔗 **Circular Reference Handling**: Smart detection and resolution of circular relationships in GraphQL schemas
-- 🚀 **Dual Transport Support**: Supports both stdio and HTTP (Streamable HTTP) transports per MCP 2025 specification
-- 📦 **Schema Caching**: Optional pre-introspection for instant startup times
-- 🔐 **Authentication Support**: Flexible header configuration for authenticated GraphQL endpoints
-- 📊 **Comprehensive Testing**: 40+ test cases covering real-world scenarios and edge cases
-- 🎯 **Zero Configuration**: Works out-of-the-box with any GraphQL endpoint
+- **Tool Generation**: Creates MCP tools from GraphQL schema introspection
+- **Parameter Validation**: Multi-layer validation prevents GraphQL errors
+- **Dual Transport**: Supports stdio (AI tools) and HTTP (development/testing)
+- **Schema Management**: Optional pre-introspection and caching
+- **Authentication**: Flexible header configuration for authenticated endpoints _[Experimental]_
 
 ## 🚀 Getting Started
 

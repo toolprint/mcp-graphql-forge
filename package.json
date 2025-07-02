@@ -1,7 +1,7 @@
 {
-  "name": "mcp-graphql-forge",
+  "name": "@toolprint/mcp-graphql-forge",
   "version": "0.0.1",
-  "description": "High-performance MCP server that automatically generates tools from GraphQL schemas with intelligent caching and validation",
+  "description": "MCP server that exposes GraphQL APIs to AI tools through automatic schema introspection and tool generation",
   "main": "dist/cli.js",
   "type": "module",
   "bin": {
@@ -44,9 +44,11 @@
     "automation",
     "schema-introspection",
     "caching",
-    "typescript"
+    "typescript",
+    "toolprint",
+    "onegrep"
   ],
-  "author": "Toolprint, Inc. <hello@toolprint.com>",
+  "author": "OneGrep, Inc. <support@onegrep.dev>",
   "license": "Apache-2.0",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
