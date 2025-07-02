@@ -26,7 +26,7 @@ An MCP server that makes GraphQL APIs accessible to AI tools by:
 1. **Start the server**:
    ```bash
    # Start server with HTTP transport
-   GRAPHQL_ENDPOINT="https://your-api.com/graphql" npx mcp-graphql-forge --transport http --port 3001
+   GRAPHQL_ENDPOINT="https://your-api.com/graphql" npx @toolprint/mcp-graphql-forge --transport http --port 3001
    ```
 
 2. **Connect with MCP Inspector**:
@@ -40,10 +40,10 @@ An MCP server that makes GraphQL APIs accessible to AI tools by:
    # Using environment variables for configuration
    export GRAPHQL_ENDPOINT="https://api.github.com/graphql"
    export GRAPHQL_AUTH_HEADER="Bearer YOUR_TOKEN"
-   npx mcp-graphql-forge --transport http --port 3001
+   npx @toolprint/mcp-graphql-forge --transport http --port 3001
 
    # Or all in one line
-   GRAPHQL_ENDPOINT="https://api.github.com/graphql" GRAPHQL_AUTH_HEADER="Bearer YOUR_TOKEN" npx mcp-graphql-forge --transport http --port 3001
+   GRAPHQL_ENDPOINT="https://api.github.com/graphql" GRAPHQL_AUTH_HEADER="Bearer YOUR_TOKEN" npx @toolprint/mcp-graphql-forge --transport http --port 3001
    ```
 
 ### Direct AI Integration (Claude/Cursor)
@@ -55,7 +55,7 @@ Create an `mcp.json` in your project root:
     "mcpServers": {
         "mcp-graphql-forge": {
             "command": "npx",
-            "args": ["mcp-graphql-forge"],
+            "args": ["@toolprint/mcp-graphql-forge"],
             "env": {
                 "GRAPHQL_ENDPOINT": "https://your-api.com/graphql",
                 "GRAPHQL_AUTH_HEADER": "Bearer YOUR_TOKEN"
