@@ -20,7 +20,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/bin.js",
     "dev": "tsx src/server.ts",
     "dev:http": "tsx src/http-server.ts",
     "start": "node dist/server.js",

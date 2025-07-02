@@ -84,11 +84,11 @@ class GraphQLMCPServer {
       }
 
       this.tools = generateMCPToolsFromSchema(introspectionResult);
-      
+
       // Count queries and mutations
       const queryTools = this.tools.filter(tool => tool.name.startsWith('query_'));
       const mutationTools = this.tools.filter(tool => tool.name.startsWith('mutation_'));
-      
+
       console.log(`Generated ${this.tools.length} tools from GraphQL schema:`);
       console.log(`  - ${queryTools.length} query tools`);
       console.log(`  - ${mutationTools.length} mutation tools`);
@@ -107,7 +107,7 @@ class GraphQLMCPServer {
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
-      
+
       try {
         // Find the tool definition to get GraphQL metadata
         const tool = this.tools.find(t => t.name === name);
@@ -122,7 +122,7 @@ class GraphQLMCPServer {
         }
 
         const query = this.buildGraphQLOperation(tool._graphql, args);
-        
+
         // Debug: Print the complete GraphQL request in a readable format
         console.debug('\n🚀 GraphQL Request:', name);
         console.debug('\n📝 Query:');
@@ -132,7 +132,7 @@ class GraphQLMCPServer {
           console.debug(JSON.stringify(args, null, 2));
         }
         console.debug('\n⏳ Executing...\n');
-        
+
         const result = await this.graphqlClient.request(query, args);
 
         // Debug: Print successful response (summarized)
@@ -150,7 +150,7 @@ class GraphQLMCPServer {
         };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        
+
         // Debug: Print the error details
         console.debug('❌ GraphQL Error:', name);
         console.debug('💥 Error:', errorMessage);
@@ -164,7 +164,7 @@ class GraphQLMCPServer {
           }
         }
         console.debug('');
-        
+
         return {
           content: [
             {
@@ -181,26 +181,26 @@ class GraphQLMCPServer {
   private validateRequiredParameters(tool: MCPTool, args: any): string[] {
     const missingParams: string[] = [];
     const requiredParams = tool.inputSchema.required || [];
-    
+
     for (const param of requiredParams) {
-      if (args === undefined || args === null || 
-          !Object.prototype.hasOwnProperty.call(args, param) || 
-          args[param] === undefined || args[param] === null) {
+      if (args === undefined || args === null ||
+        !Object.prototype.hasOwnProperty.call(args, param) ||
+        args[param] === undefined || args[param] === null) {
         missingParams.push(param);
       }
     }
-    
+
     return missingParams;
   }
 
   private buildGraphQLOperation(graphqlInfo: NonNullable<MCPTool['_graphql']>, variables: any): string {
     const { fieldName, operationType, args, fieldSelection } = graphqlInfo;
-    
+
     // Build variable declarations using proper GraphQL types
     const variableDeclarations = args
       .map(arg => `$${arg.name}: ${getGraphQLVariableType(arg.type)}`)
       .join(', ');
-    
+
     // Build variable usage
     const variableUsage = args
       .map(arg => `${arg.name}: $${arg.name}`)
@@ -218,7 +218,7 @@ class GraphQLMCPServer {
 
   async start() {
     await this.loadTools();
-    
+
     if (this.config.transport === 'http') {
       await this.startHttpServer();
     } else {
@@ -234,21 +234,21 @@ class GraphQLMCPServer {
 
   private async startHttpServer() {
     const port = this.config.port || 3000;
-    
+
     const app = express();
     app.use(express.json());
-    
+
     // Map to store transports by session ID
     const transports: Record<string, StreamableHTTPServerTransport> = {};
-    
+
     // MCP POST endpoint
     const mcpPostHandler = async (req: express.Request, res: express.Response) => {
       const sessionId = req.headers['mcp-session-id'] as string;
       console.log(sessionId ? `Received MCP request for session: ${sessionId}` : 'Received MCP request:', req.body);
-      
+
       try {
         let transport: StreamableHTTPServerTransport;
-        
+
         if (sessionId && transports[sessionId]) {
           // Reuse existing transport
           transport = transports[sessionId];
@@ -262,7 +262,7 @@ class GraphQLMCPServer {
               transports[sessionId] = transport;
             }
           });
-          
+
           // Set up onclose handler to clean up transport when closed
           transport.onclose = () => {
             const sid = transport.sessionId;
@@ -271,7 +271,7 @@ class GraphQLMCPServer {
               delete transports[sid];
             }
           };
-          
+
           // Connect the transport to the MCP server BEFORE handling the request
           await this.server.connect(transport);
           await transport.handleRequest(req as any, res as any, req.body);
@@ -288,7 +288,7 @@ class GraphQLMCPServer {
           });
           return;
         }
-        
+
         // Handle the request with existing transport
         await transport.handleRequest(req as any, res as any, req.body);
       } catch (error) {
@@ -305,29 +305,29 @@ class GraphQLMCPServer {
         }
       }
     };
-    
+
     // MCP GET endpoint for SSE streams
     const mcpGetHandler = async (req: express.Request, res: express.Response) => {
       const sessionId = req.headers['mcp-session-id'] as string;
-      
+
       if (!sessionId || !transports[sessionId]) {
         res.status(400).send('Invalid or missing session ID');
         return;
       }
-      
+
       const transport = transports[sessionId];
       await transport.handleRequest(req as any, res as any);
     };
-    
+
     // MCP DELETE endpoint for session termination
     const mcpDeleteHandler = async (req: express.Request, res: express.Response) => {
       const sessionId = req.headers['mcp-session-id'] as string;
-      
+
       if (!sessionId || !transports[sessionId]) {
         res.status(400).send('Invalid or missing session ID');
         return;
       }
-      
+
       try {
         const transport = transports[sessionId];
         await transport.handleRequest(req as any, res as any);
@@ -338,21 +338,21 @@ class GraphQLMCPServer {
         }
       }
     };
-    
+
     // Health check endpoint
     app.get('/health', (req, res) => {
-      res.json({ 
-        status: 'ok', 
+      res.json({
+        status: 'ok',
         tools: this.tools.length,
-        endpoint: this.config.graphqlEndpoint 
+        endpoint: this.config.graphqlEndpoint
       });
     });
-    
+
     // Set up MCP routes
     app.post('/mcp', mcpPostHandler);
     app.get('/mcp', mcpGetHandler);
     app.delete('/mcp', mcpDeleteHandler);
-    
+
     app.listen(port, () => {
       console.log(`GraphQL MCP Server started with HTTP transport on port ${port}`);
       console.log(`MCP endpoint: http://localhost:${port}/mcp`);
@@ -361,9 +361,9 @@ class GraphQLMCPServer {
   }
 }
 
-async function main() {
+export async function main() {
   const program = new Command();
-  
+
   program
     .name('fast-mcp-graphql')
     .description('MCP server that proxies to GraphQL services with dynamic tool generation')
