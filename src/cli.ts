@@ -365,7 +365,7 @@ export async function main() {
   const program = new Command();
 
   program
-    .name('fast-mcp-graphql')
+    .name('toolprint-graphql-mcp-forge')
     .description('MCP server that proxies to GraphQL services with dynamic tool generation')
     .version('1.0.0')
     .option('--no-introspection', 'Skip schema introspection and tool generation on startup')
