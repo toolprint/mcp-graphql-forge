@@ -6,4 +6,4 @@ dist/
 schema.json
 tools.json
 **/.claude
-
+.cursor
