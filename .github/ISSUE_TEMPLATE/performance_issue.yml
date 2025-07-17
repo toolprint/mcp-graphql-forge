@@ -1,0 +1,131 @@
+name: Performance Issue
+description: Report performance issues or slow behavior
+title: "[Performance] "
+labels: ["performance", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a performance issue! Please provide details to help us identify and fix the problem.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Performance Issue Description
+      description: Describe the performance problem you're experiencing
+      placeholder: Describe the performance issue...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-performance
+    attributes:
+      label: Expected Performance
+      description: What performance did you expect?
+      placeholder: Expected response time, memory usage, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-performance
+    attributes:
+      label: Actual Performance
+      description: What performance are you actually seeing?
+      placeholder: Actual response time, memory usage, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this performance issue?
+      placeholder: |
+        1. Set up GraphQL endpoint with X types
+        2. Run command '...'
+        3. Observe slow performance
+    validations:
+      required: true
+
+  - type: textarea
+    id: schema-info
+    attributes:
+      label: GraphQL Schema Information
+      description: Information about the GraphQL schema
+      placeholder: |
+        - Number of types: ~50
+        - Schema complexity: high/medium/low
+        - Deeply nested types: yes/no
+        - Large result sets: yes/no
+
+  - type: dropdown
+    id: operation-type
+    attributes:
+      label: Operation Type
+      description: What type of operation is slow?
+      options:
+        - Schema introspection
+        - Tool generation
+        - GraphQL query execution
+        - Field selection cache building
+        - Server startup
+        - HTTP requests
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Performance Metrics
+      description: Specific metrics if available
+      placeholder: |
+        - Response time: 5 seconds
+        - Memory usage: 500MB
+        - CPU usage: 80%
+        - Number of operations: 100
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of MCP GraphQL Forge are you using?
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js Version
+      description: What version of Node.js are you using?
+      placeholder: v18.19.0
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      placeholder: macOS 14.0, Windows 11, Ubuntu 22.04
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context about the performance issue
+      placeholder: Add any other context about the performance issue here...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to make sure this is not a duplicate
+          required: true
+        - label: I have provided performance metrics where possible
+          required: true

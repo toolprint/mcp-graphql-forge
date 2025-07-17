@@ -5,6 +5,20 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 [![MCP](https://img.shields.io/badge/MCP-2024--11--05-green)](https://modelcontextprotocol.io/)
 
+## Quick Install
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=toolprint-mcp-graphql&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMm5weCUyMC15JTIwJTQwdG9vbHByaW50JTJGbWNwLWdyYXBocWwtZm9yZ2UlMjIlMkMlMjJlbnYlMjIlM0ElN0IlMjJHUkFQSFFMX0VORFBPSU5UJTIyJTNBJTIyaHR0cHMlM0ElMkYlMkZ5b3VyLWFwaS5jb20lMkZncmFwaHFsJTIyJTJDJTIyR1JBUEhRTF9BVVRIX0hFQURFUiUyMiUzQSUyMkJlYXJlciUyMFlPVVJfVE9LRU4lMjIlN0QlN0Q%3D)
+
+### Alternative Installation Methods
+
+```bash
+# Via Smithery (recommended)
+npx @smithery/cli install @toolprint/mcp-graphql-forge --client claude
+
+# Via npm
+npm install -g @toolprint/mcp-graphql-forge
+```
+
 An MCP server that makes GraphQL APIs accessible to AI tools by:
 - Automatically generating MCP tools from GraphQL schema introspection
 - Validating parameters and handling errors for reliable AI interactions
@@ -20,6 +34,8 @@ An MCP server that makes GraphQL APIs accessible to AI tools by:
 - **Authentication**: Flexible header configuration for authenticated endpoints _[Experimental]_
 
 ## 🚀 Getting Started
+
+> **Note**: Docker runtime support is currently a work in progress. For production deployments, we recommend using the TypeScript runtime on platforms like Smithery.
 
 ### Quick Start with HTTP Mode (Recommended for Development)
 

@@ -1,0 +1,38 @@
+# Smithery configuration file: https://smithery.ai/docs/deployments
+
+runtime: "typescript"
+
+startCommand:
+  type: "http"
+  configSchema:
+    type: "object"
+    required:
+      - GRAPHQL_ENDPOINT
+    properties:
+      GRAPHQL_ENDPOINT:
+        type: "string"
+        description: "The GraphQL API endpoint URL"
+        example: "https://api.github.com/graphql"
+      GRAPHQL_AUTH_HEADER:
+        type: "string"
+        description: "Authorization header for GraphQL requests (e.g., Bearer token)"
+        example: "Bearer your_token_here"
+      GRAPHQL_HEADER_X_API_KEY:
+        type: "string"
+        description: "Custom API key header for GraphQL requests"
+      GRAPHQL_HEADER_X_CLIENT_ID:
+        type: "string"
+        description: "Custom client ID header for GraphQL requests"
+      SCHEMA_PATH:
+        type: "string"
+        description: "Path to cached GraphQL schema file"
+        default: "./schema.json"
+      PORT:
+        type: "string"
+        description: "HTTP server port"
+        default: "3000"
+
+exampleConfig:
+  GRAPHQL_ENDPOINT: "https://api.github.com/graphql"
+  GRAPHQL_AUTH_HEADER: "Bearer ghp_your_github_token_here"
+  PORT: "3000"
