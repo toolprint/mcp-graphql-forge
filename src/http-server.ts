@@ -7,6 +7,7 @@ import { join } from 'path';
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { generateMCPToolsFromSchema } from './tool-generator.js';
 import { introspectGraphQLSchema } from './introspect.js';
+import logger from './logger.js';
 import { IntrospectionQuery } from 'graphql';
 
 interface ServerConfig {
@@ -50,9 +51,9 @@ class GraphQLMCPHTTPServer {
       if (this.config.schemaPath && existsSync(this.config.schemaPath)) {
         const schemaData = readFileSync(this.config.schemaPath, 'utf-8');
         introspectionResult = JSON.parse(schemaData);
-        console.log('Loaded schema from file:', this.config.schemaPath);
+        logger.info('Loaded schema from file:', this.config.schemaPath);
       } else {
-        console.log('Introspecting GraphQL schema...');
+        logger.info('Introspecting GraphQL schema...');
         introspectionResult = await introspectGraphQLSchema({
           endpoint: this.config.graphqlEndpoint,
           headers: this.config.headers
@@ -60,9 +61,9 @@ class GraphQLMCPHTTPServer {
       }
 
       this.tools = generateMCPToolsFromSchema(introspectionResult);
-      console.log(`Generated ${this.tools.length} tools from GraphQL schema`);
+      logger.info(`Generated ${this.tools.length} tools from GraphQL schema`);
     } catch (error) {
-      console.error('Failed to load tools:', error);
+      logger.error('Failed to load tools:', error);
       throw error;
     }
   }
@@ -153,9 +154,9 @@ class GraphQLMCPHTTPServer {
     
     const port = this.config.port || 3000;
     httpServer.listen(port, () => {
-      console.log(`GraphQL MCP HTTP Server started on port ${port}`);
-      console.log(`Health check: http://localhost:${port}/health`);
-      console.log(`Note: Server uses stdio transport for MCP communication`);
+      logger.info(`GraphQL MCP HTTP Server started on port ${port}`);
+      logger.info(`Health check: http://localhost:${port}/health`);
+      logger.info(`Note: Server uses stdio transport for MCP communication`);
     });
   }
 }
@@ -178,7 +179,7 @@ async function main() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
-    console.error('Server failed to start:', error);
+    logger.error('Server failed to start:', error);
     process.exit(1);
   });
 }

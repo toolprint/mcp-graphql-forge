@@ -13,6 +13,7 @@ import { randomUUID } from 'node:crypto';
 import { generateMCPToolsFromSchema, MCPTool, getGraphQLVariableType } from './tool-generator.js';
 import { introspectGraphQLSchema } from './introspect.js';
 import { IntrospectionQuery, GraphQLArgument, GraphQLType, isNonNullType, isListType } from 'graphql';
+import logger from './logger.js';
 
 interface ServerConfig {
   graphqlEndpoint: string;
@@ -59,18 +60,18 @@ class GraphQLMCPServer {
         if (this.config.schemaPath && existsSync(this.config.schemaPath)) {
           const schemaData = readFileSync(this.config.schemaPath, 'utf-8');
           introspectionResult = JSON.parse(schemaData);
-          console.log('Loaded schema from cache file:', this.config.schemaPath);
+          logger.info('Loaded schema from cache file:', this.config.schemaPath);
         } else {
-          console.error('No cached schema found and introspection disabled.');
-          console.error('To generate a schema cache, run one of the following:');
-          console.error('  1. Run without --no-introspection flag: npx fast-mcp-graphql');
-          console.error('  2. Or run: npm run introspect');
-          console.error(`  3. Or set GRAPHQL_ENDPOINT and run: npx fast-mcp-graphql`);
+          logger.error('No cached schema found and introspection disabled.');
+          logger.error('To generate a schema cache, run one of the following:');
+          logger.error('  1. Run without --no-introspection flag: npx fast-mcp-graphql');
+          logger.error('  2. Or run: npm run introspect');
+          logger.error(`  3. Or set GRAPHQL_ENDPOINT and run: npx fast-mcp-graphql`);
           throw new Error('No schema available');
         }
       } else {
         // Always introspect from network and update cache
-        console.log('Introspecting GraphQL schema...');
+        logger.info('Introspecting GraphQL schema...');
         introspectionResult = await introspectGraphQLSchema({
           endpoint: this.config.graphqlEndpoint,
           headers: this.config.headers
@@ -79,7 +80,7 @@ class GraphQLMCPServer {
         // Save the introspected schema for future use
         if (this.config.schemaPath) {
           writeFileSync(this.config.schemaPath, JSON.stringify(introspectionResult, null, 2));
-          console.log('Schema saved to:', this.config.schemaPath);
+          logger.info('Schema saved to:', this.config.schemaPath);
         }
       }
 
@@ -89,11 +90,11 @@ class GraphQLMCPServer {
       const queryTools = this.tools.filter(tool => tool.name.startsWith('query_'));
       const mutationTools = this.tools.filter(tool => tool.name.startsWith('mutation_'));
 
-      console.log(`Generated ${this.tools.length} tools from GraphQL schema:`);
-      console.log(`  - ${queryTools.length} query tools`);
-      console.log(`  - ${mutationTools.length} mutation tools`);
+      logger.info(`Generated ${this.tools.length} tools from GraphQL schema:`);
+      logger.info(`  - ${queryTools.length} query tools`);
+      logger.info(`  - ${mutationTools.length} mutation tools`);
     } catch (error) {
-      console.error('Failed to load tools:', error);
+      logger.error('Failed to load tools:', error);
       throw error;
     }
   }
@@ -124,21 +125,21 @@ class GraphQLMCPServer {
         const query = this.buildGraphQLOperation(tool._graphql, args);
 
         // Debug: Print the complete GraphQL request in a readable format
-        console.debug('\n🚀 GraphQL Request:', name);
-        console.debug('\n📝 Query:');
-        console.debug(query);
+        logger.debug('\n🚀 GraphQL Request:', name);
+        logger.debug('\n📝 Query:');
+        logger.debug(query);
         if (args && Object.keys(args).length > 0) {
-          console.debug('\n📊 Variables:');
-          console.debug(JSON.stringify(args, null, 2));
+          logger.debug('\n📊 Variables:');
+          logger.debug(JSON.stringify(args, null, 2));
         }
-        console.debug('\n⏳ Executing...\n');
+        logger.debug('\n⏳ Executing...\n');
 
         const result = await this.graphqlClient.request(query, args);
 
         // Debug: Print successful response (summarized)
-        console.debug('✅ Success');
-        console.debug('📦 Response keys:', result && typeof result === 'object' ? Object.keys(result).join(', ') : 'none');
-        console.debug('');
+        logger.debug('✅ Success');
+        logger.debug('📦 Response keys:', result && typeof result === 'object' ? Object.keys(result).join(', ') : 'none');
+        logger.debug('');
 
         return {
           content: [
@@ -152,18 +153,18 @@ class GraphQLMCPServer {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
         // Debug: Print the error details
-        console.debug('❌ GraphQL Error:', name);
-        console.debug('💥 Error:', errorMessage);
+        logger.debug('❌ GraphQL Error:', name);
+        logger.debug('💥 Error:', errorMessage);
         if (error && typeof error === 'object' && 'response' in error) {
           const response = (error as any).response;
           if (response?.status) {
-            console.debug('📊 Status:', response.status);
+            logger.debug('📊 Status:', response.status);
           }
           if (response?.errors) {
-            console.debug('🚨 GraphQL Errors:', JSON.stringify(response.errors, null, 2));
+            logger.debug('🚨 GraphQL Errors:', JSON.stringify(response.errors, null, 2));
           }
         }
-        console.debug('');
+        logger.debug('');
 
         return {
           content: [
@@ -229,7 +230,7 @@ class GraphQLMCPServer {
   private async startStdioServer() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log('GraphQL MCP Server started with stdio transport');
+    logger.info('GraphQL MCP Server started with stdio transport');
   }
 
   private async startHttpServer() {
@@ -244,7 +245,7 @@ class GraphQLMCPServer {
     // MCP POST endpoint
     const mcpPostHandler = async (req: express.Request, res: express.Response) => {
       const sessionId = req.headers['mcp-session-id'] as string;
-      console.log(sessionId ? `Received MCP request for session: ${sessionId}` : 'Received MCP request:', req.body);
+      logger.info(sessionId ? `Received MCP request for session: ${sessionId}` : 'Received MCP request:', req.body);
 
       try {
         let transport: StreamableHTTPServerTransport;
@@ -258,7 +259,7 @@ class GraphQLMCPServer {
             sessionIdGenerator: () => randomUUID(),
             onsessioninitialized: (sessionId: string) => {
               // Store the transport by session ID when session is initialized
-              console.log(`Session initialized with ID: ${sessionId}`);
+              logger.info(`Session initialized with ID: ${sessionId}`);
               transports[sessionId] = transport;
             }
           });
@@ -267,7 +268,7 @@ class GraphQLMCPServer {
           transport.onclose = () => {
             const sid = transport.sessionId;
             if (sid && transports[sid]) {
-              console.log(`Transport closed for session ${sid}, removing from transports map`);
+              logger.info(`Transport closed for session ${sid}, removing from transports map`);
               delete transports[sid];
             }
           };
@@ -292,7 +293,7 @@ class GraphQLMCPServer {
         // Handle the request with existing transport
         await transport.handleRequest(req as any, res as any, req.body);
       } catch (error) {
-        console.error('Error handling MCP request:', error);
+        logger.error('Error handling MCP request:', error);
         if (!res.headersSent) {
           res.status(500).json({
             jsonrpc: '2.0',
@@ -332,7 +333,7 @@ class GraphQLMCPServer {
         const transport = transports[sessionId];
         await transport.handleRequest(req as any, res as any);
       } catch (error) {
-        console.error('Error handling session termination:', error);
+        logger.error('Error handling session termination:', error);
         if (!res.headersSent) {
           res.status(500).send('Error processing session termination');
         }
@@ -354,9 +355,9 @@ class GraphQLMCPServer {
     app.delete('/mcp', mcpDeleteHandler);
 
     app.listen(port, () => {
-      console.log(`GraphQL MCP Server started with HTTP transport on port ${port}`);
-      console.log(`MCP endpoint: http://localhost:${port}/mcp`);
-      console.log(`Health check: http://localhost:${port}/health`);
+      logger.info(`GraphQL MCP Server started with HTTP transport on port ${port}`);
+      logger.info(`MCP endpoint: http://localhost:${port}/mcp`);
+      logger.info(`Health check: http://localhost:${port}/health`);
     });
   }
 }
@@ -397,15 +398,15 @@ export async function main() {
     }
   });
 
-  console.log(`Starting fast-mcp-graphql server:`);
-  console.log(`- Endpoint: ${config.graphqlEndpoint}`);
-  console.log(`- Transport: ${config.transport}`);
-  console.log(`- Schema introspection: ${config.skipIntrospection ? 'disabled' : 'enabled'}`);
+  logger.info(`Starting fast-mcp-graphql server:`);
+  logger.info(`- Endpoint: ${config.graphqlEndpoint}`);
+  logger.info(`- Transport: ${config.transport}`);
+  logger.info(`- Schema introspection: ${config.skipIntrospection ? 'disabled' : 'enabled'}`);
   if (config.schemaPath) {
-    console.log(`- Schema cache: ${config.schemaPath}`);
+    logger.info(`- Schema cache: ${config.schemaPath}`);
   }
   if (config.transport === 'http') {
-    console.log(`- Port: ${config.port}`);
+    logger.info(`- Port: ${config.port}`);
   }
 
   const server = new GraphQLMCPServer(config);
@@ -414,7 +415,7 @@ export async function main() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
-    console.error('Server failed to start:', error);
+    logger.error('Server failed to start:', error);
     process.exit(1);
   });
 }

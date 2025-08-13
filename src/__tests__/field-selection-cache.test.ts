@@ -37,11 +37,11 @@ describe('Field Selection Caching System', () => {
       expect(Object.keys(cache.minimal).length).toBeGreaterThan(0);
       
       // Check that minimal selections are valid GraphQL
-      for (const [typeName, selection] of Object.entries(cache.minimal)) {
-        if (selection) {
-          expect(selection).toMatch(/^\{\s*\w+\s*\}$/); // Should be like "{ id }" or "{ documentId }"
+        for (const [, selection] of Object.entries(cache.minimal)) {
+          if (selection) {
+            expect(selection).toMatch(/^\{\s*\w+\s*\}$/); // Should be like "{ id }" or "{ documentId }"
+          }
         }
-      }
     });
   });
 
@@ -116,12 +116,12 @@ describe('Field Selection Caching System', () => {
       const cache = getFieldSelectionCache();
       
       // Check minimal selections - should prefer documentId when available
-      for (const [typeName, selection] of Object.entries(cache.minimal)) {
-        if (selection.includes('documentId')) {
-          expect(selection).toContain('documentId');
-          expect(selection).not.toContain('id');
+        for (const selection of Object.values(cache.minimal)) {
+          if (selection.includes('documentId')) {
+            expect(selection).toContain('documentId');
+            expect(selection).not.toContain('id');
+          }
         }
-      }
     });
   });
 

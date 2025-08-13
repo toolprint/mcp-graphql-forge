@@ -1,4 +1,5 @@
 import { createServer } from 'http';
+import logger from '../../logger.js';
 import { getIntrospectionQuery } from 'graphql';
 import { mockIntrospectionResult } from './introspection-result.js';
 
@@ -59,13 +60,13 @@ export function createMockGraphQLServer(port: number = 4000) {
     server,
     start: () => new Promise<void>((resolve) => {
       server.listen(port, () => {
-        console.log(`Mock GraphQL server started on port ${port}`);
+        logger.info(`Mock GraphQL server started on port ${port}`);
         resolve();
       });
     }),
     stop: () => new Promise<void>((resolve) => {
       server.close(() => {
-        console.log('Mock GraphQL server stopped');
+        logger.info('Mock GraphQL server stopped');
         resolve();
       });
     })

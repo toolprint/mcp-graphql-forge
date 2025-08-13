@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { GraphQLClient } from 'graphql-request';
 import { generateMCPToolsFromSchema, MCPTool, getGraphQLVariableType } from '../tool-generator.js';
 import { mockIntrospectionResult } from './fixtures/introspection-result.js';
+import logger from '../logger.js';
 
 // Simple mock GraphQL server that handles actual queries
 function createSimpleMockGraphQLServer(port: number = 4004) {
@@ -93,8 +94,8 @@ function createSimpleMockGraphQLServer(port: number = 4004) {
 }
 
 // Helper to build GraphQL operations like the actual server does
-function buildGraphQLOperation(graphqlInfo: NonNullable<MCPTool['_graphql']>, variables: any): string {
-  const { fieldName, operationType, args, fieldSelection } = graphqlInfo;
+  function buildGraphQLOperation(graphqlInfo: NonNullable<MCPTool['_graphql']>): string {
+    const { fieldName, operationType, args, fieldSelection } = graphqlInfo;
   
   const variableDeclarations = args
     .map(arg => `$${arg.name}: ${getGraphQLVariableType(arg.type)}`)
@@ -139,7 +140,7 @@ describe('GraphQL Execution Tests', () => {
       expect(userTool?._graphql?.fieldSelection).toBeDefined();
       
       const fieldSelection = userTool?._graphql?.fieldSelection || '';
-      console.log('User tool field selection:', fieldSelection);
+      logger.info('User tool field selection:', fieldSelection);
       
       // Should contain all user fields
       expect(fieldSelection).toContain('id');
@@ -162,7 +163,7 @@ describe('GraphQL Execution Tests', () => {
       expect(userTool?._graphql).toBeDefined();
       
       const query = buildGraphQLOperation(userTool!._graphql!, { id: '1' });
-      console.log('Generated query:', query);
+      logger.info('Generated query:', query);
       
       // Query should be properly formatted
       expect(query).toContain('query userOperation');
@@ -185,7 +186,7 @@ describe('GraphQL Execution Tests', () => {
       expect(usersTool?._graphql).toBeDefined();
       
       const query = buildGraphQLOperation(usersTool!._graphql!, {});
-      console.log('Generated users query:', query);
+      logger.info('Generated users query:', query);
       
       // Query should be properly formatted
       expect(query).toContain('query usersOperation');
@@ -212,7 +213,7 @@ describe('GraphQL Execution Tests', () => {
       };
       
       const query = buildGraphQLOperation(createUserTool!._graphql!, variables);
-      console.log('Generated mutation:', query);
+      logger.info('Generated mutation:', query);
       
       // Query should be properly formatted
       expect(query).toContain('mutation createUserOperation');
@@ -235,7 +236,7 @@ describe('GraphQL Execution Tests', () => {
       tools.forEach(tool => {
         const fieldSelection = tool._graphql?.fieldSelection || '';
         if (fieldSelection.includes('{')) {
-          console.log(`Tool ${tool.name} field selection:`, fieldSelection);
+          logger.info(`Tool ${tool.name} field selection:`, fieldSelection);
           
           // Should be properly formatted with braces
           expect(fieldSelection).toMatch(/\{[\s\S]*\}/);
@@ -249,7 +250,7 @@ describe('GraphQL Execution Tests', () => {
       
       // Should contain field selections for list items
       expect(fieldSelection).toBeDefined();
-      console.log('Users tool field selection:', fieldSelection);
+      logger.info('Users tool field selection:', fieldSelection);
     });
   });
 

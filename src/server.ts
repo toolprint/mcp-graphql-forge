@@ -6,6 +6,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { generateMCPToolsFromSchema } from './tool-generator.js';
 import { introspectGraphQLSchema } from './introspect.js';
+import logger from './logger.js';
 import { IntrospectionQuery } from 'graphql';
 
 interface ServerConfig {
@@ -49,9 +50,9 @@ class GraphQLMCPServer {
       if (this.config.schemaPath && existsSync(this.config.schemaPath)) {
         const schemaData = readFileSync(this.config.schemaPath, 'utf-8');
         introspectionResult = JSON.parse(schemaData);
-        console.log('Loaded schema from file:', this.config.schemaPath);
+        logger.info('Loaded schema from file:', this.config.schemaPath);
       } else {
-        console.log('Introspecting GraphQL schema...');
+        logger.info('Introspecting GraphQL schema...');
         introspectionResult = await introspectGraphQLSchema({
           endpoint: this.config.graphqlEndpoint,
           headers: this.config.headers
@@ -59,9 +60,9 @@ class GraphQLMCPServer {
       }
 
       this.tools = generateMCPToolsFromSchema(introspectionResult);
-      console.log(`Generated ${this.tools.length} tools from GraphQL schema`);
+      logger.info(`Generated ${this.tools.length} tools from GraphQL schema`);
     } catch (error) {
-      console.error('Failed to load tools:', error);
+      logger.error('Failed to load tools:', error);
       throw error;
     }
   }
@@ -134,7 +135,7 @@ class GraphQLMCPServer {
     
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log('GraphQL MCP Server started');
+    logger.info('GraphQL MCP Server started');
   }
 }
 
@@ -155,7 +156,7 @@ async function main() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
-    console.error('Server failed to start:', error);
+    logger.error('Server failed to start:', error);
     process.exit(1);
   });
 }

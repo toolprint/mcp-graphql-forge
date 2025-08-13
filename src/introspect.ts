@@ -2,6 +2,7 @@ import { GraphQLClient, gql } from 'graphql-request';
 import { getIntrospectionQuery, buildClientSchema, introspectionFromSchema, IntrospectionQuery } from 'graphql';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
+import logger from './logger.js';
 
 interface IntrospectionConfig {
   endpoint: string;
@@ -20,12 +21,12 @@ export async function introspectGraphQLSchema(config: IntrospectionConfig): Prom
     
     if (config.outputPath) {
       writeFileSync(config.outputPath, JSON.stringify(result, null, 2));
-      console.log(`Schema introspection saved to: ${config.outputPath}`);
+      logger.info(`Schema introspection saved to: ${config.outputPath}`);
     }
     
     return result;
   } catch (error) {
-    console.error('Failed to introspect GraphQL schema:', error);
+    logger.error('Failed to introspect GraphQL schema:', error);
     throw error;
   }
 }
@@ -81,7 +82,7 @@ export function generateToolsFromSchema(introspectionResult: IntrospectionQuery)
 async function main() {
   const endpoint = process.env.GRAPHQL_ENDPOINT;
   if (!endpoint) {
-    console.error('Please set GRAPHQL_ENDPOINT environment variable');
+    logger.error('Please set GRAPHQL_ENDPOINT environment variable');
     process.exit(1);
   }
 
@@ -102,9 +103,9 @@ async function main() {
 
     const tools = generateToolsFromSchema(introspectionResult);
     writeFileSync(toolsPath, JSON.stringify(tools, null, 2));
-    console.log(`Generated ${tools.length} tools and saved to: ${toolsPath}`);
+    logger.info(`Generated ${tools.length} tools and saved to: ${toolsPath}`);
   } catch (error) {
-    console.error('Introspection failed:', error);
+    logger.error('Introspection failed:', error);
     process.exit(1);
   }
 }
