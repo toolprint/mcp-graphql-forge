@@ -1,4 +1,4 @@
-import { 
+import {
   GraphQLSchema, 
   GraphQLObjectType, 
   GraphQLInterfaceType,
@@ -20,6 +20,7 @@ import {
   buildClientSchema,
   printType
 } from 'graphql';
+import logger from './logger.js';
 
 export interface MCPTool {
   name: string;
@@ -324,7 +325,7 @@ export function generateMCPToolsFromSchema(introspectionResult: IntrospectionQue
   const schema = buildClientSchema(introspectionResult);
   const tools: MCPTool[] = [];
   
-  console.log('🗂️  Building field selection cache for all types...');
+  logger.info('🗂️  Building field selection cache for all types...');
   
   // Pre-generate field selections for all object types to populate cache
   const typeMap = schema.getTypeMap();
@@ -340,7 +341,7 @@ export function generateMCPToolsFromSchema(introspectionResult: IntrospectionQue
     }
   }
   
-  console.log(`📊 Generated field selections for ${cacheGenerations} types`);
+  logger.info(`📊 Generated field selections for ${cacheGenerations} types`);
   
   const queryType = schema.getQueryType();
   if (queryType) {
@@ -358,7 +359,7 @@ export function generateMCPToolsFromSchema(introspectionResult: IntrospectionQue
     }
   }
   
-  console.log(`💾 Field selection cache contains ${typeFieldSelectionCache.size} full selections and ${minimalFieldSelectionCache.size} minimal selections`);
+  logger.info(`💾 Field selection cache contains ${typeFieldSelectionCache.size} full selections and ${minimalFieldSelectionCache.size} minimal selections`);
   
   return tools;
 }
