@@ -1,3 +1,5 @@
+[![MSeeP.ai Security Assessment Badge](https://mseep.net/pr/toolprint-mcp-graphql-forge-badge.png)](https://mseep.ai/app/toolprint-mcp-graphql-forge)
+
 # MCP GraphQL Forge
 
 [![NPM Version](https://img.shields.io/npm/v/@toolprint/mcp-graphql-forge)](https://www.npmjs.com/package/@toolprint/mcp-graphql-forge)
